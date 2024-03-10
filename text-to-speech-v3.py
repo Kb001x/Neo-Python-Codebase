@@ -22,33 +22,14 @@ def get_text():
     # Remove characters matched by pattern
     mod_string = re.sub(pattern, '', text)
     text = mod_string
-    create_file(text)
+    makeit(text)
 
 
-# create_speech() # can be called independently, needs text file!
-def create_file(text):  # cant write to file with newlines, newlines completely ignored and don't write to file,
-    # STILL converting directly from IDE
-    with open("default.txt", "w+") as file:
-        # text = input() # testing
-        file.write(text)
-        file.close()  # redundant?
-        create_speech("default.txt")
-
-
-# gets text, and passes it to create file
-def create_speech(text_file):
-    i = 1
-    file = open(text_file, "r", encoding='utf-8').read().replace("\n", " ").replace("–", "dash")
-    # quotes = re.findall(r'" [^"$]* "', file)
-    name = "default{}.mp3".format(i)
-    speech = gTTS(text=file, lang="en", slow=False)
-    speech.save(name)
-    # os.startfile("C:/Users/Charles/PycharmProjects/Text-To-Speech-Orig-v2")
-    playsound("C:\\Users\\Karl\\PycharmProjects\\jarvis\\" + name)
-    delete_file(name)
 
 
 def makeit(txt):
+    x = 1  # number of seconds to wait before executing final code block
+    print("Audio Playback Beginning in {} Second(s)".format(x))
     client = OpenAI()
     speech_file_path = Path(__file__).parent / "speech.mp3"
     response = client.audio.speech.create(
@@ -57,20 +38,23 @@ def makeit(txt):
         input=txt
     )
     response.stream_to_file(speech_file_path)
-    x = 5  # number of secibds to wait before executing final code block
-    print("Audio Playback Beginning in {} Second(s)".format(x))
-    time.sleep(x)
 
-
-def playit():
+    # Estimate the duration of the sound file
+    file_size_in_bytes = os.path.getsize("speech.mp3")
+    # This is an assumption; you'll need to adjust this based on your actual audio files
+    bitrate_in_kbps = 160  # Typical bitrate for MP3 files, adjust as necessary
+    duration_in_seconds = file_size_in_bytes / (bitrate_in_kbps * 128)
+    print("Playback Initiated")
+    print("Audio Playback Ending in {} Second(s)".format(duration_in_seconds))
+    #time.sleep(x)
     pygame.mixer.init()
+    pygame.mixer.music.unload()
     pygame.mixer.music.load("speech.mp3")
     pygame.mixer.music.play()
-    # Wait for the music to finish playing
-    while pygame.mixer.music.get_busy():
-        time.sleep(1)  # You can adjust the sleep time to control the loop frequency
-    # The program will continue here after the music finishes
-    print("Audio playback finished.")
+    time.sleep(duration_in_seconds+2) # sleep timer, otherwise audio ends abruptly
+    pygame.mixer.music.unload()
+
+    print("playback completed")
 
 
 # create_file() # will auto call create speech!
@@ -119,7 +103,7 @@ def save_file():
 
 # GUI DEFINITIONS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 window = tk.Tk()
-window.title("Text-to-Speech App v3.00")
+window.title("Text-to-Speech App v3.00 uses Open AI TTS")
 # set the row and column configurations.
 window.rowconfigure(0, minsize=500, weight=1)
 window.columnconfigure(1, minsize=800, weight=1)
