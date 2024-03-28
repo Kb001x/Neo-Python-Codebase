@@ -11,6 +11,21 @@ from pathlib import Path
 from openai import OpenAI
 import pygame.mixer
 import time
+from datetime import datetime
+
+
+# Get the current time and date
+now = datetime.now()
+voices =("alloy","echo","fable","onyx","nova","shimmer")
+voice = voices[4] # change voice currently in use here!! better than scrolling all over the place and looking for them!
+# Format the string as "9:27PM on March, 15 2024"
+formatted_now = now.strftime("%I:%M %p on %B, %d %Y")
+
+# Print the formatted string
+print("\nKarl's TTS App Initializing")
+print(formatted_now)
+print("Current voice: "+ voice)
+print("\n")
 
 
 def get_text():
@@ -34,7 +49,7 @@ def makeit(txt):
     speech_file_path = Path(__file__).parent / "speech.mp3"
     response = client.audio.speech.create(
         model="tts-1",
-        voice="alloy",
+        voice=voice,
         input=txt
     )
     response.stream_to_file(speech_file_path)
